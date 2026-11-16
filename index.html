@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study-Buddy – Student Study & Deadline Planner</title>
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --brand-primary: #1d4ed8;
+      --brand-hover: #1e40af;
+      --brand-light: #eff6ff;
+      --border-color: #cbd5e1;
+      --high-bg: #fef2f2;
+      --high-text: #991b1b;
+      --high-border: #fca5a5;
+      --med-bg: #fffbeb;
+      --med-text: #92400e;
+      --med-border: #fcd34d;
+      --low-bg: #f0fdf4;
+      --low-text: #166534;
+      --low-border: #86efac;
+      --focus-ring: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    /* WCAG 2.0 Operable: High-Contrast Visible Focus Indicator */
+    :focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Header & Navigation */
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--brand-primary);
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      padding: 0.55rem 0.9rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-btn:hover {
+      background-color: var(--brand-light);
+      color: var(--brand-primary);
+    }
+
+    .nav-btn.active {
+      background-color: var(--brand-light);
+      color: var(--brand-primary);
+      box-shadow: inset 0 -3px 0 var(--brand-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .btn-primary {
+      background-color: var(--brand-primary);
+      color: #ffffff;
+      border: none;
+      padding: 0.6rem 1.1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--brand-hover);
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 0.9rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background-color: #f1f5f9;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem 3rem;
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    /* Calm Emotional Banner */
+    .attention-banner {
+      background-color: var(--brand-light);
+      border-left: 4px solid var(--brand-primary);
+      padding: 0.9rem 1.2rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* Responsive Grids */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 860px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      margin-bottom: 1.5rem;
+    }
+
+    .subject-card {
+      border: 1px solid var(--border-color);
+      border-top: 4px solid var(--brand-primary);
+      border-radius: 8px;
+      padding: 1rem;
+      background: #ffffff;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      color: var(--text-primary);
+    }
+
+    h3 {
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    /* Quick Filter Pills */
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      background: var(--brand-primary);
+      color: #ffffff;
+      border-color: var(--brand-primary);
+    }
+
+    /* Task List Items */
+    .task-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .task-item {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      background: #ffffff;
+    }
+
+    .task-item.completed {
+      background: #f8fafc;
+      opacity: 0.8;
+    }
+
+    .task-item.completed .task-title {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    .task-left {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .task-checkbox {
+      width: 1.2rem;
+      height: 1.2rem;
+      margin-top: 0.2rem;
+      cursor: pointer;
+      accent-color: var(--brand-primary);
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 1rem;
+      display: block;
+    }
+
+    .task-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* Multi-channel WCAG Priority Badges (Color + Icon + Text) */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .badge-high {
+      background-color: var(--high-bg);
+      color: var(--high-text);
+      border-color: var(--high-border);
+    }
+
+    .badge-medium {
+      background-color: var(--med-bg);
+      color: var(--med-text);
+      border-color: var(--med-border);
+    }
+
+    .badge-low {
+      background-color: var(--low-bg);
+      color: var(--low-text);
+      border-color: var(--low-border);
+    }
+
+    .badge-subject {
+      background-color: #f1f5f9;
+      color: #334155;
+      border-color: #cbd5e1;
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background-color: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0.75rem 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #16a34a;
+      transition: width 0.3s ease;
+    }
+
+    /* Calendar Grid */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .cal-day-header {
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding-bottom: 0.35rem;
+    }
+
+    .cal-cell {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      min-height: 95px;
+      padding: 0.45rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .cal-date {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .cal-pill {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 600;
+      display: block;
+    }
+
+    /* Study Group Posts */
+    .post-card {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: #ffffff;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+    }
+
+    /* Accessible Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-dialog {
+      background: #ffffff;
+      border-radius: 10px;
+      max-width: 480px;
+      width: 100%;
+      padding: 1.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .inline-check {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    .error-msg {
+      color: #b91c1c;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    /* Non-Intrusive Undo Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #1e293b;
+      color: #ffffff;
+      padding: 0.85rem 1.2rem;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      z-index: 300;
+    }
+
+    .toast.show {
+      display: flex;
+    }
+
+    .toast button {
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- WCAG 2.0 ARIA Live Region for Screen Readers -->
+  <div id="ariaAnnouncer" class="sr-only" aria-live="polite"></div>
+
+  <header id="appHeader">
+    <div class="brand">
+      <span aria-hidden="true">📘</span>
+      <span>Study-Buddy</span>
+    </div>
+
+    <nav aria-label="Main Navigation">
+      <ul>
+        <li><button class="nav-btn active" data-view="dashboard" onclick="switchView('dashboard', this)">Dashboard</button></li>
+        <li><button class="nav-btn" data-view="subjects" onclick="switchView('subjects', this)">Subjects</button></li>
+        <li><button class="nav-btn" data-view="calendar" onclick="switchView('calendar', this)">Calendar</button></li>
+        <li><button class="nav-btn" data-view="groups" onclick="switchView('groups', this)">Study Groups</button></li>
+        <li><button class="nav-btn" data-view="profile" onclick="switchView('profile', this)">Profile &amp; Settings</button></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <button class="btn-primary" onclick="openTaskModal()">+ New Task</button>
+      <button class="btn-secondary" onclick="logoutUser()">Log Out</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- VIEW 1: PERSONALIZED STUDENT DASHBOARD -->
+    <section id="view-dashboard" class="view-section active" aria-labelledby="dash-heading">
+      <div style="margin-bottom: 1.25rem;">
+        <h1 id="dash-heading">Welcome back, <span id="userDisplayName">Unarine Phungo</span> (ST10467455)</h1>
+        <p style="color: var(--text-secondary);">Here is your focused academic overview for this week.</p>
+      </div>
+
+      <!-- Calm Emotional Support Banner -->
+      <div class="attention-banner" role="region" aria-label="Focus Recommendation">
+        <div>
+          <strong>📌 Needs Attention Next:</strong>
+          <span id="nextAttentionText">HCIN6222 POE Prototype &amp; Report (Due 2026-11-18)</span>
+        </div>
+        <button class="btn-secondary" onclick="switchView('calendar', document.querySelector('[data-view=calendar]'))">View on Calendar</button>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Left Column: Assignments & Quick Filtering -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h2>Academic Tasks &amp; Deadlines</h2>
+            </div>
+
+            <!-- Quick Filter Pills -->
+            <div class="filter-bar" role="group" aria-label="Filter academic tasks">
+              <button class="filter-pill active" onclick="setFilter('all', this)">All Tasks</button>
+              <button class="filter-pill" onclick="setFilter('High', this)">⚠️ High Priority</button>
+              <button class="filter-pill" onclick="setFilter('pending', this)">⏳ Due Soon</button>
+              <button class="filter-pill" onclick="setFilter('completed', this)">✅ Completed</button>
+            </div>
+
+            <ul id="taskList" class="task-list"></ul>
+          </div>
+        </div>
+
+        <!-- Right Column: Weekly Progress & Study Sessions -->
+        <div>
+          <div class="card">
+            <h2>Weekly Progress Tracker</h2>
+            <p id="progressSummary" style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.35rem;">
+              2 of 4 tasks completed (50%)
+            </p>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" id="progressBar">
+              <div class="progress-fill" id="progressFill" style="width: 50%;"></div>
+            </div>
+            <p id="encouragementMsg" style="font-size: 0.85rem; color: #166534; font-weight: 600;">
+              🌟 Steady progress! Keep ticking off one item at a time.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Planned Study Sessions</h2>
+            </div>
+            <ul class="task-list">
+              <li class="task-item">
+                <div>
+                  <span class="task-title">WCAG 2.0 Accessibility Audit</span>
+                  <div class="task-meta">
+                    <span class="badge badge-subject">HCIN6222</span>
+                    <span>Today, 19:00 – 20:30</span>
+                  </div>
+                </div>
+              </li>
+              <li class="task-item">
+                <div>
+                  <span class="task-title">SQL Stored Procedures Revision</span>
+                  <div class="task-meta">
+                    <span class="badge badge-subject">DBAS6211</span>
+                    <span>Tomorrow, 16:00 – 17:30</span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: SUBJECT MANAGEMENT -->
+    <section id="view-subjects" class="view-section" aria-labelledby="subj-heading">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 id="subj-heading">Enrolled Subjects &amp; Modules</h1>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Organise your coursework by module. Added subjects automatically appear in task forms.</p>
+          </div>
+        </div>
+
+        <form onsubmit="addSubject(event)" style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: flex-end;">
+          <div style="flex: 1; min-width: 150px;">
+            <label for="newSubjCode">Module Code *</label>
+            <input type="text" id="newSubjCode" placeholder="e.g., WEDE6201" required />
+          </div>
+          <div style="flex: 2; min-width: 220px;">
+            <label for="newSubjName">Module Name *</label>
+            <input type="text" id="newSubjName" placeholder="e.g., Web Development (Introduction)" required />
+          </div>
+          <button type="submit" class="btn-primary">+ Add Subject</button>
+        </form>
+
+        <div id="subjectsContainer" class="subjects-grid"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: INTERACTIVE DEADLINE CALENDAR -->
+    <section id="view-calendar" class="view-section" aria-labelledby="cal-heading">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 id="cal-heading">November 2026 – Assessment &amp; Study Calendar</h1>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Color-and-icon-coded deadlines help identify busy weeks at a glance.</p>
+          </div>
+          <button class="btn-primary" onclick="openTaskModal()">+ Add Deadline</button>
+        </div>
+
+        <div class="calendar-grid" role="grid" aria-label="November 2026 Calendar">
+          <div class="cal-day-header">Mon</div>
+          <div class="cal-day-header">Tue</div>
+          <div class="cal-day-header">Wed</div>
+          <div class="cal-day-header">Thu</div>
+          <div class="cal-day-header">Fri</div>
+          <div class="cal-day-header">Sat</div>
+          <div class="cal-day-header">Sun</div>
+
+          <div class="cal-cell"><span class="cal-date">16 (Today)</span><span class="cal-pill badge-low">📘 Study: WCAG</span></div>
+          <div class="cal-cell"><span class="cal-date">17</span><span class="cal-pill badge-medium">⏳ PROG6212 Quiz</span></div>
+          <div class="cal-cell"><span class="cal-date">18</span><span class="cal-pill badge-high">⚠️ HCIN6222 POE</span></div>
+          <div class="cal-cell"><span class="cal-date">19</span></div>
+          <div class="cal-cell"><span class="cal-date">20</span><span class="cal-pill badge-medium">⏳ DBAS6211 Lab</span></div>
+          <div class="cal-cell"><span class="cal-date">21</span><span class="cal-pill badge-low">📘 Group Revision</span></div>
+          <div class="cal-cell"><span class="cal-date">22</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: SUBJECT STUDY GROUPS (SOCIAL INTERACTION) -->
+    <section id="view-groups" class="view-section" aria-labelledby="group-heading">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 id="group-heading">Subject Study Groups</h1>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Private tasks stay private. Share tips and collaborate respectfully with module peers.</p>
+          </div>
+        </div>
+
+        <form onsubmit="addGroupPost(event)" style="margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label for="groupPostInput">Post a study tip or question to HCIN6222 Study Cohort:</label>
+            <textarea id="groupPostInput" rows="2" placeholder="e.g., Remember to verify 4.5:1 contrast ratios for WCAG 2.0 Level AA!"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Share with Group</button>
+        </form>
+
+        <div id="groupFeed">
+          <article class="post-card">
+            <div class="post-header">
+              <strong>Thabo M. • HCIN6222 Cohort</strong>
+              <span>2 hours ago</span>
+            </div>
+            <p>Tip for Part 3: Use Tab navigation on your prototype to make sure focus rings show up clearly on every button and form input.</p>
+            <div class="post-actions">
+              <button class="btn-secondary" onclick="encouragePost(this)">👏 Helpful Tip (4)</button>
+              <button class="btn-secondary" onclick="showToast('Post flagged for moderator review.')">🚩 Report</button>
+            </div>
+          </article>
+
+          <article class="post-card">
+            <div class="post-header">
+              <strong>Amahle K. • DBAS6211 Cohort</strong>
+              <span>Yesterday</span>
+            </div>
+            <p>Anyone keen for a 45-minute online revision session on relational normalization tomorrow at 17:00?</p>
+            <div class="post-actions">
+              <button class="btn-secondary" onclick="encouragePost(this)">🙌 Count Me In (3)</button>
+              <button class="btn-secondary" onclick="showToast('Post flagged for moderator review.')">🚩 Report</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: PROFILE & SETTINGS -->
+    <section id="view-profile" class="view-section" aria-labelledby="prof-heading">
+      <div class="card" style="max-width: 640px;">
+        <h1 id="prof-heading">Student Profile &amp; Preferences</h1>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">
+          Manage your account details, reminder notifications, and privacy settings.
+        </p>
+
+        <form onsubmit="saveProfile(event)">
+          <div class="form-group">
+            <label for="profName">Full Name</label>
+            <input type="text" id="profName" value="Unarine Phungo" required />
+          </div>
+
+          <div class="form-group">
+            <label for="profEmail">Student Email Address</label>
+            <input type="email" id="profEmail" value="ST10467455@rcconnect.edu.za" required />
+          </div>
+
+          <div class="form-group">
+            <label class="inline-check">
+              <input type="checkbox" checked />
+              <span>Send gentle reminders 24 hours before task deadlines</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="inline-check">
+              <input type="checkbox" checked />
+              <span>Keep personal task lists private from Study Group members</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary">Save Preferences</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW 6: USER LOGIN / REGISTRATION SCREEN -->
+    <section id="view-login" class="view-section" aria-labelledby="login-heading">
+      <div class="card" style="max-width: 440px; margin: 2rem auto;">
+        <h1 id="login-heading">Sign In to Study-Buddy</h1>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">
+          Access your centralized subjects, deadlines, and study sessions.
+        </p>
+
+        <form onsubmit="loginUser(event)">
+          <div class="form-group">
+            <label for="loginEmail">Student Email *</label>
+            <input type="email" id="loginEmail" value="ST10467455@rcconnect.edu.za" required />
+          </div>
+
+          <div class="form-group">
+            <label for="loginPass">Password *</label>
+            <input type="password" id="loginPass" value="••••••••••••" required />
+          </div>
+
+          <button type="submit" class="btn-primary" style="width: 100%;">Log In</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ADD TASK MODAL (Recognition Over Recall + Error Prevention) -->
+  <div id="taskModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <div class="card-header">
+        <h2 id="modalTitle">Add New Academic Task</h2>
+        <button class="btn-secondary" onclick="closeTaskModal()" aria-label="Close modal">✕</button>
+      </div>
+
+      <form id="taskForm" onsubmit="saveTask(event)" novalidate>
+        <div class="form-group">
+          <label for="taskTitleInput">Task Title (Required) *</label>
+          <input type="text" id="taskTitleInput" required />
+          <div id="titleError" class="error-msg">Please enter a descriptive task title.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="taskSubjectSelect">Select Enrolled Subject *</label>
+          <select id="taskSubjectSelect"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="taskDateInput">Due Date (Required) *</label>
+          <input type="date" id="taskDateInput" value="2026-11-18" required />
+          <div id="dateError" class="error-msg">Please choose a valid due date.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="taskPrioritySelect">Priority Level</label>
+          <select id="taskPrioritySelect">
+            <option value="High">⚠️ High Priority</option>
+            <option value="Medium">⏳ Medium Priority</option>
+            <option value="Low">📘 Low Priority</option>
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
+          <button type="button" class="btn-secondary" onclick="closeTaskModal()">Cancel</button>
+          <button type="submit" class="btn-primary">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NON-INTRUSIVE UNDO TOAST NOTIFICATION -->
+  <div id="toastNotification" class="toast" role="status" aria-live="polite">
+    <span id="toastMessage">Task deleted.</span>
+    <button id="undoBtn" onclick="undoDelete()" style="display: none;">Undo</button>
+  </div>
+
+  <script>
+    let subjects = [
+      { code: "HCIN6222", name: "Human-Computer Interaction", lecturer: "Diploma in Software Development" },
+      { code: "PROG6212", name: "Programming 2B", lecturer: "Diploma in Software Development" },
+      { code: "DBAS6211", name: "Databases", lecturer: "Diploma in Software Development" },
+      { code: "SAND6221", name: "System Analysis & Design", lecturer: "Diploma in Software Development" }
+    ];
+
+    let tasks = [
+      { id: 1, title: "HCIN6222 POE Final Prototype & Report", subject: "HCIN6222", due: "2026-11-18", priority: "High", completed: false },
+      { id: 2, title: "PROG6212 C# Unit Testing Worksheet", subject: "PROG6212", due: "2026-11-17", priority: "Medium", completed: false },
+      { id: 3, title: "DBAS6211 Stored Procedures Script", subject: "DBAS6211", due: "2026-11-14", priority: "High", completed: true },
+      { id: 4, title: "SAND6221 Use Case Diagram Review", subject: "SAND6221", due: "2026-11-15", priority: "Low", completed: true }
+    ];
+
+    let currentFilter = "all";
+    let lastDeletedTask = null;
+    let toastTimeout = null;
+
+    function announce(text) {
+      document.getElementById("ariaAnnouncer").textContent = text;
+    }
+
+    function switchView(viewName, btnEl) {
+      document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById("view-" + viewName).classList.add("active");
+
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+      if (btnEl) btnEl.classList.add("active");
+      announce("Switched to " + viewName + " view.");
+    }
+
+    function logoutUser() {
+      document.getElementById("appHeader").style.display = "none";
+      switchView("login", null);
+      showToast("You have safely logged out.", false);
+    }
+
+    function loginUser(e) {
+      e.preventDefault();
+      document.getElementById("appHeader").style.display = "flex";
+      switchView("dashboard", document.querySelector("[data-view=dashboard]"));
+      showToast("Welcome back to Study-Buddy!", false);
+    }
+
+    function saveProfile(e) {
+      e.preventDefault();
+      const updatedName = document.getElementById("profName").value.trim();
+      if (updatedName) {
+        document.getElementById("userDisplayName").textContent = updatedName;
+      }
+      showToast("Profile and notification preferences saved.", false);
+    }
+
+    function renderSubjects() {
+      const container = document.getElementById("subjectsContainer");
+      const select = document.getElementById("taskSubjectSelect");
+      container.innerHTML = "";
+      select.innerHTML = "";
+
+      subjects.forEach(sub => {
+        const count = tasks.filter(t => t.subject === sub.code && !t.completed).length;
+        const card = document.createElement("div");
+        card.className = "subject-card";
+        card.innerHTML = `
+          <span class="badge badge-subject" style="margin-bottom:0.4rem;">${sub.code}</span>
+          <h3>${sub.name}</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.4rem;">
+            Pending tasks: <strong>${count}</strong>
+          </p>
+        `;
+        container.appendChild(card);
+
+        const opt = document.createElement("option");
+        opt.value = sub.code;
+        opt.textContent = `${sub.code} – ${sub.name}`;
+        select.appendChild(opt);
+      });
+    }
+
+    function addSubject(e) {
+      e.preventDefault();
+      const code = document.getElementById("newSubjCode").value.trim().toUpperCase();
+      const name = document.getElementById("newSubjName").value.trim();
+      if (!code || !name) return;
+
+      subjects.push({ code, name, lecturer: "Enrolled Module" });
+      document.getElementById("newSubjCode").value = "";
+      document.getElementById("newSubjName").value = "";
+      renderSubjects();
+      showToast(`Added module ${code} (${name}).`, false);
+    }
+
+    function setFilter(filter, btnEl) {
+      currentFilter = filter;
+      document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+      btnEl.classList.add("active");
+      renderTasks();
+      announce("Filtered tasks by " + filter);
+    }
+
+    function getPriorityBadge(priority) {
+      if (priority === "High") return '<span class="badge badge-high">⚠️ High Priority</span>';
+      if (priority === "Medium") return '<span class="badge badge-medium">⏳ Medium Priority</span>';
+      return '<span class="badge badge-low">📘 Low Priority</span>';
+    }
+
+    function renderTasks() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+
+      const filtered = tasks.filter(t => {
+        if (currentFilter === "High") return t.priority === "High" && !t.completed;
+        if (currentFilter === "pending") return !t.completed;
+        if (currentFilter === "completed") return t.completed;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<li style="color: var(--text-secondary); padding: 0.75rem;">No tasks match this filter.</li>';
+      }
+
+      filtered.forEach(task => {
+        const li = document.createElement("li");
+        li.className = "task-item" + (task.completed ? " completed" : "");
+        li.innerHTML = `
+          <div class="task-left">
+            <input type="checkbox" class="task-checkbox" id="chk-${task.id}" ${task.completed ? "checked" : ""}
+              aria-label="Mark ${task.title} as complete" onchange="toggleComplete(${task.id})" />
+            <div>
+              <label for="chk-${task.id}" class="task-title" style="cursor:pointer;">${task.title}</label>
+              <div class="task-meta">
+                <span class="badge badge-subject">${task.subject}</span>
+                ${getPriorityBadge(task.priority)}
+                <span>Due: ${task.due}</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn-secondary" aria-label="Delete ${task.title}" onclick="deleteTask(${task.id})">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+
+      updateProgress();
+      renderSubjects();
+    }
+
+    function toggleComplete(id) {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        renderTasks();
+        const statusText = task.completed ? `Completed "${task.title}"! Great work.` : `Marked "${task.title}" as pending.`;
+        showToast(statusText, false);
+        announce(statusText);
+      }
+    }
+
+    function deleteTask(id) {
+      const idx = tasks.findIndex(t => t.id === id);
+      if (idx > -1) {
+        lastDeletedTask = tasks[idx];
+        tasks.splice(idx, 1);
+        renderTasks();
+        showToast(`Deleted "${lastDeletedTask.title}".`, true);
+        announce(`Deleted ${lastDeletedTask.title}. Press Undo to restore.`);
+      }
+    }
+
+    function undoDelete() {
+      if (lastDeletedTask) {
+        tasks.unshift(lastDeletedTask);
+        announce(`Restored ${lastDeletedTask.title}.`);
+        lastDeletedTask = null;
+        renderTasks();
+        document.getElementById("toastNotification").classList.remove("show");
+      }
+    }
+
+    function updateProgress() {
+      const total = tasks.length;
+      const done = tasks.filter(t => t.completed).length;
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+      document.getElementById("progressSummary").textContent = `${done} of ${total} tasks completed (${pct}%)`;
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressBar").setAttribute("aria-valuenow", pct);
+
+      const nextTask = tasks.find(t => !t.completed && t.priority === "High") || tasks.find(t => !t.completed);
+      document.getElementById("nextAttentionText").textContent = nextTask
+        ? `${nextTask.title} (Due ${nextTask.due})`
+        : "All caught up! Great job staying on top of your studies.";
+    }
+
+    function openTaskModal() {
+      document.getElementById("taskModal").classList.add("open");
+      document.getElementById("taskTitleInput").focus();
+    }
+
+    function closeTaskModal() {
+      document.getElementById("taskModal").classList.remove("open");
+      document.getElementById("titleError").style.display = "none";
+      document.getElementById("dateError").style.display = "none";
+    }
+
+    function saveTask(e) {
+      e.preventDefault();
+      const titleInput = document.getElementById("taskTitleInput");
+      const dateInput = document.getElementById("taskDateInput");
+      let valid = true;
+
+      if (!titleInput.value.trim()) {
+        document.getElementById("titleError").style.display = "block";
+        valid = false;
+      } else {
+        document.getElementById("titleError").style.display = "none";
+      }
+
+      if (!dateInput.value) {
+        document.getElementById("dateError").style.display = "block";
+        valid = false;
+      } else {
+        document.getElementById("dateError").style.display = "none";
+      }
+
+      if (!valid) return;
+
+      const newTask = {
+        id: Date.now(),
+        title: titleInput.value.trim(),
+        subject: document.getElementById("taskSubjectSelect").value,
+        due: dateInput.value,
+        priority: document.getElementById("taskPrioritySelect").value,
+        completed: false
+      };
+
+      tasks.unshift(newTask);
+      titleInput.value = "";
+      closeTaskModal();
+      renderTasks();
+      showToast(`Saved "${newTask.title}" to your planner.`, false);
+      announce(`Saved task ${newTask.title}`);
+    }
+
+    function showToast(msg, allowUndo = false) {
+      const toast = document.getElementById("toastNotification");
+      document.getElementById("toastMessage").textContent = msg;
+      document.getElementById("undoBtn").style.display = allowUndo ? "inline-block" : "none";
+      toast.classList.add("show");
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 5000);
+    }
+
+    function addGroupPost(e) {
+      e.preventDefault();
+      const input = document.getElementById("groupPostInput");
+      if (!input.value.trim()) return;
+
+      const feed = document.getElementById("groupFeed");
+      const article = document.createElement("article");
+      article.className = "post-card";
+      article.innerHTML = `
+        <div class="post-header">
+          <strong>Unarine P. (You) • HCIN6222 Cohort</strong>
+          <span>Just now</span>
+        </div>
+        <p>${input.value.trim()}</p>
+        <div class="post-actions">
+          <button class="btn-secondary" onclick="encouragePost(this)">👏 Helpful Tip (1)</button>
+        </div>
+      `;
+      feed.prepend(article);
+      input.value = "";
+      showToast("Posted to HCIN6222 Study Group.", false);
+    }
+
+    function encouragePost(btn) {
+      btn.textContent = "👏 Encouraged!";
+      btn.disabled = true;
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeTaskModal();
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>
